@@ -1,10 +1,12 @@
-package com.github.frapontillo.ncu;
+package com.github.frapontillo.ncu.settings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceFragment;
+
+import com.github.frapontillo.ncu.R;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private SharedPreferences preferences;

@@ -1,8 +1,10 @@
-package com.github.frapontillo.ncu;
+package com.github.frapontillo.ncu.detail;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
+import com.github.frapontillo.ncu.R;
 
 public class DetailActivity extends AppCompatActivity {
     @Override

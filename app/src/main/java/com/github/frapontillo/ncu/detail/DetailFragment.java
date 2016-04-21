@@ -1,4 +1,4 @@
-package com.github.frapontillo.ncu;
+package com.github.frapontillo.ncu.detail;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.github.frapontillo.ncu.R;
 
 public class DetailFragment extends Fragment {
     private TextView label;

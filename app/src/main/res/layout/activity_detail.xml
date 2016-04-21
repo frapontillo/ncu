@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/detail_fragment"
-    android:name="com.github.frapontillo.ncu.DetailFragment"
+    android:name="com.github.frapontillo.ncu.detail.DetailFragment"
     tools:layout="@layout/list_item_forecast" />
 
 </FrameLayout>

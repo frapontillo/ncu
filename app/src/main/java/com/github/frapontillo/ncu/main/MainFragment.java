@@ -1,4 +1,4 @@
-package com.github.frapontillo.ncu;
+package com.github.frapontillo.ncu.main;
 
 import android.Manifest;
 import android.content.Intent;
@@ -19,6 +19,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.github.frapontillo.ncu.R;
+import com.github.frapontillo.ncu.settings.SettingsActivity;
+import com.github.frapontillo.ncu.weather.WeatherDataParser;
+import com.github.frapontillo.ncu.detail.DetailActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;

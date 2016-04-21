@@ -1,4 +1,4 @@
-package com.github.frapontillo.ncu;
+package com.github.frapontillo.ncu.weather;
 
 import android.text.format.Time;
 import android.util.Log;

@@ -1,4 +1,4 @@
-package com.github.frapontillo.ncu;
+package com.github.frapontillo.ncu.settings;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
