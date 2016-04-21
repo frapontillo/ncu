@@ -1,6 +1,5 @@
 package com.github.frapontillo.ncu.detail;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,9 +9,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.frapontillo.ncu.R;
+import com.github.frapontillo.ncu.settings.SettingsHelper;
+import com.github.frapontillo.ncu.weather.WeatherData;
 
 public class DetailFragment extends Fragment {
     private TextView label;
+    private boolean asImperial;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        asImperial = SettingsHelper.isImperial(getContext());
+    }
 
     @Nullable
     @Override
@@ -24,6 +32,10 @@ public class DetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        label.setText(getActivity().getIntent().getExtras().getString(Intent.EXTRA_TEXT));
+        WeatherData data = getActivity().getIntent().getExtras().getParcelable(DetailActivity.EXTRA_WEATHER_DATA);
+        if (data != null) {
+            label.setText(String.format(getString(R.string.weather_data_template),
+                                        data.day(), data.description(), data.high(asImperial), data.low(asImperial)));
+        }
     }
 }

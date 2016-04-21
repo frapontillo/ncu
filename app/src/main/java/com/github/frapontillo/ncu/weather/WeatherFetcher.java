@@ -15,7 +15,7 @@ import org.json.JSONException;
 public class WeatherFetcher {
     private final String LOG_TAG = WeatherFetcher.class.getSimpleName();
 
-    public String[] getWeatherInfo(String zipCode) {
+    public WeatherData[] getWeatherInfo(String zipCode) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 

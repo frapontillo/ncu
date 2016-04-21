@@ -42,7 +42,7 @@ public class WeatherDataParser {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    public static String[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    public static WeatherData[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -73,12 +73,11 @@ public class WeatherDataParser {
         // now we work exclusively in UTC
         dayTime = new Time();
 
-        String[] resultStrs = new String[numDays];
+        WeatherData[] results = new WeatherData[numDays];
         for (int i = 0; i < weatherArray.length(); i++) {
             // For now, using the format "Day, description, hi/low"
             String day;
             String description;
-            String highAndLow;
 
             // Get the JSON object representing the day
             JSONObject dayForecast = weatherArray.getJSONObject(i);
@@ -98,17 +97,16 @@ public class WeatherDataParser {
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
             JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-            double high = temperatureObject.getDouble(OWM_MAX);
-            double low = temperatureObject.getDouble(OWM_MIN);
+            double high = Math.round(temperatureObject.getDouble(OWM_MAX));
+            double low = Math.round(temperatureObject.getDouble(OWM_MIN));
 
-            highAndLow = formatHighLows(high, low);
-            resultStrs[i] = day + " - " + description + " - " + highAndLow;
+            results[i] = WeatherData.create(day, description, high, low);
         }
 
-        for (String s : resultStrs) {
-            Log.v(LOG_TAG, "Forecast entry: " + s);
+        for (WeatherData d : results) {
+            Log.v(LOG_TAG, "Forecast entry: " + d);
         }
-        return resultStrs;
+        return results;
 
     }
 

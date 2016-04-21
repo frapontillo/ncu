@@ -9,9 +9,12 @@
   <string name="use_imperial_summary">Check this box if you can\'t multiply by 10</string>
   <string name="use_metric_summary">Uncheck this box if you can multiply by 10</string>
 
-  // pref keys
+  <!--pref keys-->
   <string name="pref_zip_code"
     translatable="false">pref_zip_code</string>
   <string name="pref_use_imperial"
     translatable="false">pref_use_imperial</string>
+
+  <!--weather data-->
+  <string name="weather_data_template" translatable="false">%s - %s - %s/%s</string>
 </resources>

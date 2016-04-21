@@ -17,17 +17,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.detail.DetailActivity;
 import com.github.frapontillo.ncu.settings.SettingsActivity;
+import com.github.frapontillo.ncu.weather.WeatherData;
 import com.github.frapontillo.ncu.weather.WeatherFetcher;
 
 public class MainFragment extends Fragment {
     private SharedPreferences preferences;
-    private ArrayAdapter<String> listAdapter;
+    private WeatherDataAdapter listAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,17 +42,25 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container);
 
         ListView forecastList = (ListView) rootView.findViewById(R.id.forecast_list);
-        listAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_forecast);
+        listAdapter = new WeatherDataAdapter(getActivity(), R.layout.list_item_forecast);
         forecastList.setAdapter(listAdapter);
         forecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                startActivity(new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, listAdapter.getItem(position)));
+                startActivity(new Intent(getActivity(), DetailActivity.class).putExtra(DetailActivity.EXTRA_WEATHER_DATA,
+                                                                                       listAdapter.getItem(position)));
             }
         });
         fetchWeather();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // notify change to the adapter so that it can update the list temperature units
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -85,20 +93,20 @@ public class MainFragment extends Fragment {
 
     }
 
-    private class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+    private class FetchWeatherTask extends AsyncTask<String, Void, WeatherData[]> {
 
         private final WeatherFetcher weatherFetcher = new WeatherFetcher();
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected WeatherData[] doInBackground(String... params) {
             return weatherFetcher.getWeatherInfo(params[0]);
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            super.onPostExecute(strings);
+        protected void onPostExecute(WeatherData[] data) {
+            super.onPostExecute(data);
             listAdapter.clear();
-            listAdapter.addAll(strings);
+            listAdapter.addAll(data);
         }
     }
 
