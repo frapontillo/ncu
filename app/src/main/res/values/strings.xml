@@ -16,5 +16,12 @@
     translatable="false">pref_use_imperial</string>
 
   <!--weather data-->
+
+  <string name="weather_data_share_template"
+    translatable="false">%s - %s - %s/%s #Sunshine</string>
   <string name="weather_data_template" translatable="false">%s - %s - %s/%s</string>
+
+  <string name="view_location">View Location</string>
+  <string name="no_maps_installed">There is no map application installed.</string>
+  <string name="share">Share</string>
 </resources>

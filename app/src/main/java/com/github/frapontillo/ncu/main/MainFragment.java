@@ -2,12 +2,11 @@ package com.github.frapontillo.ncu.main;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,22 +17,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.detail.DetailActivity;
 import com.github.frapontillo.ncu.settings.SettingsActivity;
+import com.github.frapontillo.ncu.settings.SettingsHelper;
 import com.github.frapontillo.ncu.weather.WeatherData;
 import com.github.frapontillo.ncu.weather.WeatherFetcher;
 
 public class MainFragment extends Fragment {
-    private SharedPreferences preferences;
     private WeatherDataAdapter listAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 
     @Nullable
@@ -66,7 +65,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.forecast, menu);
+        inflater.inflate(R.menu.main, menu);
     }
 
     @Override
@@ -80,6 +79,17 @@ public class MainFragment extends Fragment {
             startActivity(new Intent(getActivity(), SettingsActivity.class));
             return true;
         }
+        if (itemId == R.id.forecast_menu_location) {
+            Intent mapsIntent = new Intent(Intent.ACTION_VIEW);
+            Uri uri = new Uri.Builder().scheme("geo").path("0:0").appendQueryParameter("q", SettingsHelper.getZipCode(getContext())).build();
+            mapsIntent.setData(uri);
+            if (mapsIntent.resolveActivity(getActivity().getPackageManager()) == null) {
+                Toast.makeText(getActivity(), R.string.no_maps_installed, Toast.LENGTH_LONG).show();
+            } else {
+                startActivity(mapsIntent);
+            }
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -89,7 +99,7 @@ public class MainFragment extends Fragment {
                 return;
             }
         }
-        new FetchWeatherTask().execute(preferences.getString(getResources().getString(R.string.pref_zip_code), null));
+        new FetchWeatherTask().execute(SettingsHelper.getZipCode(getActivity()));
 
     }
 

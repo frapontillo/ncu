@@ -43,16 +43,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    private boolean handleChangeUseImperial(boolean useImperial) {
-        imperialPreference.setSummary(useImperial ? R.string.use_metric_summary : R.string.use_imperial_summary);
-        return true;
-    }
-
-    private boolean handleChangeZipCode(String newValue) {
-        zipCodePreference.setSummary(newValue);
-        return true;
-    }
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(PREF_ZIP_CODE)) {
@@ -61,5 +51,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (key.equals(PREF_USE_IMPERIAL)) {
             handleChangeUseImperial(sharedPreferences.getBoolean(key, false));
         }
+    }
+
+    private boolean handleChangeUseImperial(boolean useImperial) {
+        imperialPreference.setSummary(useImperial ? R.string.use_metric_summary : R.string.use_imperial_summary);
+        return true;
+    }
+
+    private boolean handleChangeZipCode(String newValue) {
+        zipCodePreference.setSummary(newValue);
+        return true;
     }
 }
