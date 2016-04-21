@@ -1,13 +1,14 @@
 package com.github.frapontillo.ncu;
 
 import android.Manifest;
-import android.app.Fragment;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -42,8 +44,14 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container);
 
         ListView forecastList = (ListView) rootView.findViewById(R.id.forecast_list);
-        listAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast);
+        listAdapter = new ArrayAdapter<>(getActivity(), R.layout.list_item_forecast);
         forecastList.setAdapter(listAdapter);
+        forecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, listAdapter.getItem(position)));
+            }
+        });
         fetchWeather();
 
         return rootView;
@@ -57,8 +65,13 @@ public class MainFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.forecast_menu_refresh) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.forecast_menu_refresh) {
             fetchWeather();
+            return true;
+        }
+        if (itemId == R.id.forecast_menu_settings) {
+            startActivity(new Intent(getActivity(), SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

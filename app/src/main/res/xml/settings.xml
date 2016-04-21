@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <EditTextPreference
+    android:key="@string/pref_zip_code"
+    android:title="@string/zip_code"
+    android:defaultValue="@string/default_zip_code"/>
+  <CheckBoxPreference
+    android:defaultValue="false"
+    android:key="@string/pref_use_imperial"
+    android:title="@string/use_imperial"
+    android:summary="@string/use_imperial_summary"/>
+</PreferenceScreen>

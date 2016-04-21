@@ -4,4 +4,7 @@
   <item android:id="@+id/forecast_menu_refresh"
     app:showAsAction="never"
     android:title="@string/refresh" />
+  <item android:id="@+id/forecast_menu_settings"
+    app:showAsAction="never"
+    android:title="@string/settings"/>
 </menu>
