@@ -11,6 +11,8 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
+BuildProperties defaultProperties = BuildProperties.load('/app/default.properties', project)
+
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
@@ -21,6 +23,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        buildConfigField "String", "OPENWEATHERMAP_APIKEY", "\"${defaultProperties.getString("openWeatherMap.apiKey")}\""
     }
     buildTypes {
         release {
