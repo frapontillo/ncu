@@ -11,6 +11,11 @@
     android:label="@string/app_name"
     android:supportsRtl="true"
     android:theme="@style/AppTheme">
+
+    <provider
+      android:authorities="com.github.frapontillo.ncu"
+      android:name=".data.provider.WeatherDbProvider"/>
+
     <activity android:name=".main.MainActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
