@@ -1,7 +1,9 @@
-package com.github.frapontillo.ncu.weather;
+package com.github.frapontillo.ncu.weather.openweather;
 
 import android.text.format.Time;
 import android.util.Log;
+
+import com.github.frapontillo.ncu.weather.WeatherLocation;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+@Deprecated
 public class WeatherDataParser {
 
     private static final String LOG_TAG = WeatherDataParser.class.getSimpleName();

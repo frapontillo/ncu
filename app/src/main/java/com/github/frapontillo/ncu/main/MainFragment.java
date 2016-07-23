@@ -23,8 +23,8 @@ import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.detail.DetailActivity;
 import com.github.frapontillo.ncu.settings.SettingsActivity;
 import com.github.frapontillo.ncu.settings.SettingsHelper;
-import com.github.frapontillo.ncu.weather.WeatherData;
-import com.github.frapontillo.ncu.weather.WeatherFetcher;
+import com.github.frapontillo.ncu.weather.openweather.WeatherData;
+import com.github.frapontillo.ncu.weather.openweather.WeatherFetcher;
 
 public class MainFragment extends Fragment {
     private WeatherDataAdapter listAdapter;

@@ -1,12 +1,14 @@
-package com.github.frapontillo.ncu.weather;
+package com.github.frapontillo.ncu.weather.openweather;
 
 import android.os.Parcelable;
 
+import com.github.frapontillo.ncu.weather.WeatherLocation;
 import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
 @AutoValue
+@Deprecated
 public abstract class WeatherData implements Parcelable {
     public abstract WeatherLocation weatherLocation();
 

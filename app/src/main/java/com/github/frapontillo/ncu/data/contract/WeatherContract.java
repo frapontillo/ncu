@@ -7,7 +7,8 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import com.github.frapontillo.ncu.weather.WeatherDay;
+import com.github.frapontillo.ncu.weather.openweather.WeatherForecastDay;
+import com.github.frapontillo.ncu.weather.openweather.WeatherForecastDayCondition;
 
 import java.util.Date;
 import java.util.List;
@@ -72,7 +73,7 @@ public class WeatherContract implements BaseColumns {
         return Long.parseLong(uri.getPathSegments().get(2));
     }
 
-    public ContentValues[] toContentValues(List<WeatherDay> data, long locationId) {
+    public ContentValues[] toContentValues(List<WeatherForecastDay> data, long locationId) {
         ContentValues[] cvs = new ContentValues[data.size()];
         for (int i = 0; i < data.size(); i++) {
             cvs[i] = toContentValues(data.get(i), locationId);
@@ -80,17 +81,25 @@ public class WeatherContract implements BaseColumns {
         return cvs;
     }
 
-    public ContentValues toContentValues(WeatherDay data, long locationId) {
-        ContentValues cv = new ContentValues(4);
+    public ContentValues toContentValues(WeatherForecastDay data, long locationId) {
+        ContentValues cv = new ContentValues(9);
         cv.put(COLUMNS.DATE, data.date().getTime());
-        cv.put(COLUMNS.WEATHER_ID, data.weatherId());
+        cv.put(COLUMNS.WEATHER_ID, getFirstWeatherIdOrMinusOne(data));
         cv.put(COLUMNS.LOCATION_ID, locationId);
         cv.put(COLUMNS.HUMIDITY, data.humidity());
         cv.put(COLUMNS.PRESSURE, data.pressure());
-        cv.put(COLUMNS.TEMP_MAX, data.high());
-        cv.put(COLUMNS.TEMP_MIN, data.low());
+        cv.put(COLUMNS.TEMP_MAX, data.temperatures().max());
+        cv.put(COLUMNS.TEMP_MIN, data.temperatures().min());
         cv.put(COLUMNS.WIND_DIRECTION, data.windDirection());
         cv.put(COLUMNS.WIND_SPEED, data.windSpeed());
         return cv;
+    }
+
+    private int getFirstWeatherIdOrMinusOne(WeatherForecastDay data) {
+        List<WeatherForecastDayCondition> conditions = data.conditions();
+        if (conditions == null || conditions.isEmpty()) {
+            return -1;
+        }
+        return conditions.get(0).id();
     }
 }

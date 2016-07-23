@@ -1,9 +1,7 @@
-package com.github.frapontillo.ncu.weather;
+package com.github.frapontillo.ncu.weather.openweather;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
@@ -17,10 +15,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 import org.json.JSONException;
 
+@Deprecated
 public class WeatherFetcher {
     private final String LOG_TAG = WeatherFetcher.class.getSimpleName();
     private final ContentResolver contentResolver;
@@ -95,55 +93,10 @@ public class WeatherFetcher {
 
         try {
             WeatherData data = WeatherDataParser.getWeatherDataFromJson(forecastJsonStr, 7, zipCode);
-            persistInformation(data);
             return data;
         } catch (JSONException e) {
             return null;
         }
     }
 
-    private void persistInformation(WeatherData data) {
-        if (data == null) {
-            return;
-        }
-        List<WeatherDay> weatherDays = data.weatherDays();
-        long locationId = addLocation(data.weatherLocation());
-        addWeatherInfo(weatherDays, locationId);
-    }
-
-    private long addLocation(WeatherLocation weatherLocation) {
-        Cursor existingLocation = contentResolver.query(
-                LocationContract.CONTENT_URI,
-                new String[]{LocationContract._ID},
-                LocationContract.LOCATION_SELECTION_SETTING_PART,
-                new String[]{weatherLocation.zipCode()},
-                null
-        );
-        boolean wasFound = (existingLocation != null && existingLocation.moveToFirst());
-        long id;
-
-        if (wasFound) {
-            id = existingLocation.getLong(existingLocation.getColumnIndex(LocationContract._ID));
-            existingLocation.close();
-        } else {
-            ContentValues values = locationContract.toContentValues(
-                    weatherLocation.zipCode(),
-                    weatherLocation.cityName(),
-                    weatherLocation.latitude(),
-                    weatherLocation.longitude()
-            );
-            Uri insertedUri = contentResolver.insert(LocationContract.CONTENT_URI, values);
-            id = locationContract.getId(insertedUri);
-        }
-
-        if (existingLocation != null) {
-            existingLocation.close();
-        }
-
-        return id;
-    }
-
-    private long addWeatherInfo(List<WeatherDay> data, long locationId) {
-        return contentResolver.bulkInsert(WeatherContract.CONTENT_URI, weatherContract.toContentValues(data, locationId));
-    }
 }

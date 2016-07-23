@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.settings.SettingsHelper;
-import com.github.frapontillo.ncu.weather.WeatherDay;
+import com.github.frapontillo.ncu.weather.openweather.WeatherDay;
 
 public class WeatherDataAdapter extends ArrayAdapter<WeatherDay> {
     private final LayoutInflater layoutInflater;

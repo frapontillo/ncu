@@ -6,6 +6,8 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import com.github.frapontillo.ncu.weather.WeatherLocation;
+
 public class LocationContract implements BaseColumns {
     public static final String TABLE_NAME = "location";
     public static final String CONTENT_DIR_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + Contract.CONTENT_AUTHORITY + "/" + TABLE_NAME;
@@ -28,12 +30,12 @@ public class LocationContract implements BaseColumns {
         return Long.parseLong(uri.getPathSegments().get(1));
     }
 
-    public ContentValues toContentValues(String setting, String cityName, double latitude, double longitude) {
+    public ContentValues toContentValues(WeatherLocation weatherLocation) {
         ContentValues cv = new ContentValues(4);
-        cv.put(COLUMNS.SETTING, setting);
-        cv.put(COLUMNS.CITY_NAME, cityName);
-        cv.put(COLUMNS.LATITUDE, latitude);
-        cv.put(COLUMNS.LONGITUDE, longitude);
+        cv.put(COLUMNS.SETTING, weatherLocation.zipCode());
+        cv.put(COLUMNS.CITY_NAME, weatherLocation.cityName());
+        cv.put(COLUMNS.LATITUDE, weatherLocation.latitude());
+        cv.put(COLUMNS.LONGITUDE, weatherLocation.longitude());
         return cv;
     }
 }

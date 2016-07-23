@@ -1,4 +1,4 @@
-package com.github.frapontillo.ncu.weather;
+package com.github.frapontillo.ncu.weather.openweather;
 
 import android.os.Parcelable;
 
@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @AutoValue
+@Deprecated
 public abstract class WeatherDay implements Parcelable {
     public abstract Date date();
 
