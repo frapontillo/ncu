@@ -1,7 +1,15 @@
 package com.github.frapontillo.ncu.weather;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+
+import com.github.frapontillo.ncu.BuildConfig;
+import com.github.frapontillo.ncu.data.contract.LocationContract;
+import com.github.frapontillo.ncu.data.contract.WeatherContract;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,13 +17,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import org.json.JSONException;
 
 public class WeatherFetcher {
     private final String LOG_TAG = WeatherFetcher.class.getSimpleName();
+    private final ContentResolver contentResolver;
+    private final LocationContract locationContract;
+    private final WeatherContract weatherContract;
 
-    public WeatherData[] getWeatherInfo(String zipCode) {
+    public WeatherFetcher(Context context) {
+        contentResolver = context.getContentResolver();
+        locationContract = new LocationContract();
+        weatherContract = new WeatherContract();
+    }
+
+    public WeatherData getWeatherInfo(String zipCode) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
@@ -24,14 +42,12 @@ public class WeatherFetcher {
 
         try {
             // Construct the URL for the OpenWeatherMap query
-            // Possible parameters are avaiable at OWM's forecast API page, at
-            // http://openweathermap.org/API#forecast
             Uri uri = Uri.parse("http://api.openweathermap.org/data/2.5/forecast/daily").buildUpon()
                     .appendQueryParameter("q", zipCode)
                     .appendQueryParameter("mode", "json")
                     .appendQueryParameter("units", "metric")
                     .appendQueryParameter("cnt", "7")
-                    .appendQueryParameter("appid", "f1e82c2f95b7a1a36f33fcce52cf966d").build();
+                    .appendQueryParameter("appid", BuildConfig.OPEN_WEATHER_MAP_API_KEY).build();
             URL url = new URL(uri.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
@@ -41,7 +57,7 @@ public class WeatherFetcher {
 
             // Read the input stream into a String
             InputStream inputStream = urlConnection.getInputStream();
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             if (inputStream == null) {
                 // Nothing to do.
                 return null;
@@ -50,10 +66,8 @@ public class WeatherFetcher {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-                // But it does make debugging a *lot* easier if you print out the completed
-                // buffer for debugging.
-                buffer.append(line + "\n");
+                // Add line for debugging purposes
+                buffer.append(line).append("\n");
             }
 
             if (buffer.length() == 0) {
@@ -80,9 +94,56 @@ public class WeatherFetcher {
         }
 
         try {
-            return WeatherDataParser.getWeatherDataFromJson(forecastJsonStr, 7);
+            WeatherData data = WeatherDataParser.getWeatherDataFromJson(forecastJsonStr, 7, zipCode);
+            persistInformation(data);
+            return data;
         } catch (JSONException e) {
             return null;
         }
+    }
+
+    private void persistInformation(WeatherData data) {
+        if (data == null) {
+            return;
+        }
+        List<WeatherDay> weatherDays = data.weatherDays();
+        long locationId = addLocation(data.weatherLocation());
+        addWeatherInfo(weatherDays, locationId);
+    }
+
+    private long addLocation(WeatherLocation weatherLocation) {
+        Cursor existingLocation = contentResolver.query(
+                LocationContract.CONTENT_URI,
+                new String[]{LocationContract._ID},
+                LocationContract.LOCATION_SELECTION_SETTING_PART,
+                new String[]{weatherLocation.zipCode()},
+                null
+        );
+        boolean wasFound = (existingLocation != null && existingLocation.moveToFirst());
+        long id;
+
+        if (wasFound) {
+            id = existingLocation.getLong(existingLocation.getColumnIndex(LocationContract._ID));
+            existingLocation.close();
+        } else {
+            ContentValues values = locationContract.toContentValues(
+                    weatherLocation.zipCode(),
+                    weatherLocation.cityName(),
+                    weatherLocation.latitude(),
+                    weatherLocation.longitude()
+            );
+            Uri insertedUri = contentResolver.insert(LocationContract.CONTENT_URI, values);
+            id = locationContract.getId(insertedUri);
+        }
+
+        if (existingLocation != null) {
+            existingLocation.close();
+        }
+
+        return id;
+    }
+
+    private long addWeatherInfo(List<WeatherDay> data, long locationId) {
+        return contentResolver.bulkInsert(WeatherContract.CONTENT_URI, weatherContract.toContentValues(data, locationId));
     }
 }

@@ -103,20 +103,20 @@ public class MainFragment extends Fragment {
 
     }
 
-    private class FetchWeatherTask extends AsyncTask<String, Void, WeatherData[]> {
+    private class FetchWeatherTask extends AsyncTask<String, Void, WeatherData> {
 
-        private final WeatherFetcher weatherFetcher = new WeatherFetcher();
+        private final WeatherFetcher weatherFetcher = new WeatherFetcher(getActivity());
 
         @Override
-        protected WeatherData[] doInBackground(String... params) {
+        protected WeatherData doInBackground(String... params) {
             return weatherFetcher.getWeatherInfo(params[0]);
         }
 
         @Override
-        protected void onPostExecute(WeatherData[] data) {
+        protected void onPostExecute(WeatherData data) {
             super.onPostExecute(data);
             listAdapter.clear();
-            listAdapter.addAll(data);
+            listAdapter.addAll(data.weatherDays());
         }
     }
 

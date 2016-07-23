@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.settings.SettingsHelper;
-import com.github.frapontillo.ncu.weather.WeatherData;
+import com.github.frapontillo.ncu.weather.WeatherDay;
 
 public class DetailFragment extends Fragment {
     private TextView label;
     private boolean asImperial;
-    private WeatherData data;
+    private WeatherDay data;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

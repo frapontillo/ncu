@@ -9,9 +9,9 @@ import android.widget.TextView;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.settings.SettingsHelper;
-import com.github.frapontillo.ncu.weather.WeatherData;
+import com.github.frapontillo.ncu.weather.WeatherDay;
 
-public class WeatherDataAdapter extends ArrayAdapter<WeatherData> {
+public class WeatherDataAdapter extends ArrayAdapter<WeatherDay> {
     private final LayoutInflater layoutInflater;
 
     public WeatherDataAdapter(Context context, int resource) {
@@ -21,7 +21,7 @@ public class WeatherDataAdapter extends ArrayAdapter<WeatherData> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        WeatherData data = getItem(position);
+        WeatherDay data = getItem(position);
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_forecast, parent, false);
             // this is kinda useless right now, convertView is the only element in the ViewHolder

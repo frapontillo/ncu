@@ -3,7 +3,9 @@ package com.github.frapontillo.ncu.weather;
 import android.text.format.Time;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,27 +15,23 @@ public class WeatherDataParser {
 
     private static final String LOG_TAG = WeatherDataParser.class.getSimpleName();
 
-    /* The date/time conversion code is going to be moved outside the asynctask later,
-         * so for convenience we're breaking it out into its own method now.
-         */
-    private static String getReadableDateString(long time) {
-        // Because the API returns a unix timestamp (measured in seconds),
-        // it must be converted to milliseconds in order to be converted to valid date.
-        SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
-        return shortenedDateFormat.format(time);
-    }
+    private static final String OWM_LIST = "list";
+    private static final String OWM_WEATHER = "weather";
+    private static final String OWM_WEATHER_ID = "id";
+    private static final String OWM_TEMPERATURE = "temp";
+    private static final String OWM_MAX = "max";
+    private static final String OWM_MIN = "min";
+    private static final String OWM_DESCRIPTION = "main";
+    private static final String OWM_PRESSURE = "pressure";
+    private static final String OWM_HUMIDITY = "humidity";
+    private static final String OWM_WINDSPEED = "speed";
+    private static final String OWM_WIND_DIRECTION = "deg";
 
-    /**
-     * Prepare the weather high/lows for presentation.
-     */
-    private static String formatHighLows(double high, double low) {
-        // For presentation, assume the user doesn't care about tenths of a degree.
-        long roundedHigh = Math.round(high);
-        long roundedLow = Math.round(low);
-
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
-    }
+    private static final String OWM_CITY = "city";
+    private static final String OWM_CITY_NAME = "name";
+    private static final String OWM_COORD = "coord";
+    private static final String OWM_LATITUDE = "lat";
+    private static final String OWM_LONGITUDE = "lon";
 
     /**
      * Take the String representing the complete forecast in JSON Format and
@@ -42,18 +40,22 @@ public class WeatherDataParser {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    public static WeatherData[] getWeatherDataFromJson(String forecastJsonStr, int numDays)
+    @SuppressWarnings("deprecation")
+    public static WeatherData getWeatherDataFromJson(String forecastJsonStr, int numDays, String zipCode)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
-        final String OWM_LIST = "list";
-        final String OWM_WEATHER = "weather";
-        final String OWM_TEMPERATURE = "temp";
-        final String OWM_MAX = "max";
-        final String OWM_MIN = "min";
-        final String OWM_DESCRIPTION = "main";
+
 
         JSONObject forecastJson = new JSONObject(forecastJsonStr);
+        JSONObject city = forecastJson.getJSONObject(OWM_CITY);
+        String cityName = city.getString(OWM_CITY_NAME);
+        JSONObject coordinates = city.getJSONObject(OWM_COORD);
+        long latitude = coordinates.getLong(OWM_LATITUDE);
+        long longitude = coordinates.getLong(OWM_LONGITUDE);
+
+        WeatherLocation weatherLocation = WeatherLocation.create(zipCode, cityName, latitude, longitude);
+
         JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
         // OWM returns daily forecasts based upon the local time of the city that is being
@@ -73,26 +75,18 @@ public class WeatherDataParser {
         // now we work exclusively in UTC
         dayTime = new Time();
 
-        WeatherData[] results = new WeatherData[numDays];
+        List<WeatherDay> weatherDays = new ArrayList<>(numDays);
         for (int i = 0; i < weatherArray.length(); i++) {
-            // For now, using the format "Day, description, hi/low"
-            String day;
-            String description;
-
             // Get the JSON object representing the day
             JSONObject dayForecast = weatherArray.getJSONObject(i);
 
-            // The date/time is returned as a long.  We need to convert that
-            // into something human-readable, since most people won't read "1400356800" as
-            // "this saturday".
-            long dateTime;
-            // Cheating to convert this to UTC time, which is what we want anyhow
-            dateTime = dayTime.setJulianDay(julianStartDay + i);
-            day = getReadableDateString(dateTime);
+            long dateTime = dayTime.setJulianDay(julianStartDay + i);
+            Date date = new Date(dateTime);
 
             // description is in a child array called "weather", which is 1 element long.
             JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-            description = weatherObject.getString(OWM_DESCRIPTION);
+            String description = weatherObject.getString(OWM_DESCRIPTION);
+            int weatherId = weatherObject.getInt(OWM_WEATHER_ID);
 
             // Temperatures are in a child object called "temp".  Try not to name variables
             // "temp" when working with temperature.  It confuses everybody.
@@ -100,13 +94,18 @@ public class WeatherDataParser {
             double high = Math.round(temperatureObject.getDouble(OWM_MAX));
             double low = Math.round(temperatureObject.getDouble(OWM_MIN));
 
-            results[i] = WeatherData.create(day, description, high, low);
+            double pressure = dayForecast.getDouble(OWM_PRESSURE);
+            int humidity = dayForecast.getInt(OWM_HUMIDITY);
+            double windSpeed = dayForecast.getDouble(OWM_WINDSPEED);
+            double windDirection = dayForecast.getDouble(OWM_WIND_DIRECTION);
+
+            weatherDays.add(WeatherDay.create(date, weatherId, description, high, low, humidity, pressure, windDirection, windSpeed));
         }
 
-        for (WeatherData d : results) {
+        for (WeatherDay d : weatherDays) {
             Log.v(LOG_TAG, "Forecast entry: " + d);
         }
-        return results;
+        return WeatherData.create(weatherLocation, weatherDays);
 
     }
 

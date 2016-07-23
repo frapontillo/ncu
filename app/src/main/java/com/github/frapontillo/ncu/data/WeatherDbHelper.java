@@ -44,15 +44,17 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
             }
             versionedUpgradeScript = versionedUpgradeScript.trim();
             try {
-                db.execSQL(versionedUpgradeScript);
+                for (String sql: getStatementsFrom(versionedUpgradeScript)) {
+                    db.execSQL(sql);
+                }
             } catch (SQLException e) {
                 Log.w(LOG_TAG, String.format("Found an invalid database upgrade at iteration %d, ignoring.", i));
             }
         }
     }
 
-    public Context getContext() {
-        return context;
+    private String[] getStatementsFrom(String versionedUpgradeScript) {
+        return versionedUpgradeScript.split(";");
     }
 
     private String readVersionedUpgradeFromAssets(int upgradeIteration) {

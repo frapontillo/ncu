@@ -5,16 +5,22 @@ buildscript {
     }
     dependencies {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+        classpath 'com.novoda:build-properties-plugin:1.0.1'
     }
 }
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.novoda.build-properties'
 
-BuildProperties defaultProperties = BuildProperties.load('/app/default.properties', project)
+buildProperties {
+    secrets {
+        file project.file('default.properties')
+    }
+}
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
 
     defaultConfig {
@@ -27,7 +33,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "OPENWEATHERMAP_APIKEY", "\"${defaultProperties.getString("openWeatherMap.apiKey")}\""
+        buildConfigProperties buildProperties.secrets
     }
     buildTypes {
         release {
@@ -44,7 +50,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:appcompat-v7:24.1.0'
 
     provided 'com.google.auto.value:auto-value:1.2'
     apt 'com.ryanharter.auto.value:auto-value-parcel:0.2.1'
