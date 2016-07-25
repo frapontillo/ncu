@@ -16,7 +16,7 @@
       android:authorities="com.github.frapontillo.ncu"
       android:name=".data.provider.WeatherDbProvider"/>
 
-    <activity android:name=".main.MainActivity">
+    <activity android:name=".main.WeatherActivity">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 
@@ -27,10 +27,10 @@
     <activity
       android:name=".detail.DetailActivity"
       android:theme="@style/AppTheme"
-      android:parentActivityName=".main.MainActivity">
+      android:parentActivityName=".main.WeatherActivity">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value=".main.MainActivity" />
+        android:value=".main.WeatherActivity" />
 
     </activity>
 
@@ -38,10 +38,10 @@
       android:name=".settings.SettingsActivity"
       android:label="@string/settings"
       android:theme="@style/AppTheme"
-      android:parentActivityName=".main.MainActivity">
+      android:parentActivityName=".main.WeatherActivity">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
-        android:value=".main.MainActivity" />
+        android:value=".main.WeatherActivity" />
 
     </activity>
   </application>
