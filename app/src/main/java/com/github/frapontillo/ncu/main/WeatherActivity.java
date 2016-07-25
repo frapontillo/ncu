@@ -28,10 +28,14 @@ public class WeatherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_activity);
 
+        createPresenter();
+    }
+
+    private void createPresenter() {
         weatherService = ((SunshineApp) getApplication()).getWeatherService();
-        locationService = new LocationServiceSettings(this);
-        WeatherDisplayer weatherDisplayer = (WeatherDisplayer) findViewById(R.id.weather_view);
+        locationService = new LocationServiceSettings(getApplicationContext());
         navigator = new AndroidNavigator(this);
+        WeatherDisplayer weatherDisplayer = (WeatherDisplayer) findViewById(R.id.weather_view);
 
         presenter = new WeatherPresenter(weatherService, locationService, weatherDisplayer, navigator);
     }
@@ -46,6 +50,7 @@ public class WeatherActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         presenter.stopPresenting();
+        navigator = null;
     }
 
     @Override
