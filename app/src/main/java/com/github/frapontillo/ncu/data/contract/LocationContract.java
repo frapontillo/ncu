@@ -6,7 +6,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
-import com.github.frapontillo.ncu.weather.WeatherLocation;
+import com.github.frapontillo.ncu.weather.model.WeatherLocation;
 
 public class LocationContract implements BaseColumns {
     public static final String TABLE_NAME = "location";

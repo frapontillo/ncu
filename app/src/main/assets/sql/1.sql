@@ -11,6 +11,7 @@ CREATE TABLE `weather` (
 	`location_id`	INTEGER NOT NULL,
 	`date` INTEGER NOT NULL,
 	`weather_id`	INTEGER,
+	`weather_description`	TEXT,
 	`temp_max`	REAL,
 	`temp_min`	REAL,
 	`humidity`	REAL,

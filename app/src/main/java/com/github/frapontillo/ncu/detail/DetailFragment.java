@@ -15,18 +15,20 @@ import android.widget.TextView;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.settings.SettingsHelper;
-import com.github.frapontillo.ncu.weather.openweather.WeatherDay;
+import com.github.frapontillo.ncu.weather.model.WeatherDay;
+import com.github.frapontillo.ncu.weather.model.WeatherDayFormatter;
 
 public class DetailFragment extends Fragment {
     private TextView label;
-    private boolean asImperial;
-    private WeatherDay data;
+    private boolean isImperial;
+    private WeatherDay weatherDay;
+    private WeatherDayFormatter weatherDayFormatter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        asImperial = SettingsHelper.isImperial(getContext());
+        isImperial = SettingsHelper.isImperial(getContext());
     }
 
     @Nullable
@@ -39,11 +41,17 @@ public class DetailFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        data = getActivity().getIntent().getExtras().getParcelable(DetailActivity.EXTRA_WEATHER_DATA);
-        if (data != null) {
-            label.setText(String.format(getString(R.string.weather_data_template),
-                                        data.day(), data.description(), data.high(asImperial), data.low(asImperial)
-            ));
+        weatherDay = getActivity().getIntent().getExtras().getParcelable(DetailActivity.EXTRA_WEATHER_DATA);
+        if (weatherDay != null) {
+            weatherDayFormatter = new WeatherDayFormatter(weatherDay);
+            label.setText(
+                    String.format(
+                            getString(R.string.weather_data_template),
+                            weatherDayFormatter.getDay(),
+                            weatherDay.weatherDescription(),
+                            weatherDayFormatter.getMaxTemperature(isImperial),
+                            weatherDayFormatter.getMinTemperature(isImperial)
+                    ));
         }
     }
 
@@ -56,7 +64,12 @@ public class DetailFragment extends Fragment {
 
         boolean imperial = SettingsHelper.isImperial(getActivity());
         String shareString = String.format(
-                getString(R.string.weather_data_share_template), data.day(), data.description(), data.high(imperial), data.low(imperial));
+                getString(R.string.weather_data_share_template),
+                weatherDayFormatter.getDay(),
+                weatherDay.weatherDescription(),
+                weatherDayFormatter.getMaxTemperature(isImperial),
+                weatherDayFormatter.getMinTemperature(isImperial)
+        );
         shareActionProvider.setShareIntent(ShareCompat.IntentBuilder.from(getActivity())
                                                    .setText(shareString)
                                                    .setType("text/plain")

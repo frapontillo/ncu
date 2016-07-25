@@ -9,7 +9,8 @@ import android.widget.TextView;
 
 import com.github.frapontillo.ncu.R;
 import com.github.frapontillo.ncu.settings.SettingsHelper;
-import com.github.frapontillo.ncu.weather.openweather.WeatherDay;
+import com.github.frapontillo.ncu.weather.model.WeatherDay;
+import com.github.frapontillo.ncu.weather.model.WeatherDayFormatter;
 
 public class WeatherDataAdapter extends ArrayAdapter<WeatherDay> {
     private final LayoutInflater layoutInflater;
@@ -21,7 +22,7 @@ public class WeatherDataAdapter extends ArrayAdapter<WeatherDay> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        WeatherDay data = getItem(position);
+        WeatherDay weatherDay = getItem(position);
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.list_item_forecast, parent, false);
             // this is kinda useless right now, convertView is the only element in the ViewHolder
@@ -29,8 +30,16 @@ public class WeatherDataAdapter extends ArrayAdapter<WeatherDay> {
         }
         ViewHolder viewHolder = (ViewHolder) convertView.getTag();
         boolean isImperial = SettingsHelper.isImperial(getContext());
-        viewHolder.text.setText(String.format(getContext().getString(R.string.weather_data_template),
-                                              data.day(), data.description(), data.high(isImperial), data.low(isImperial)));
+        WeatherDayFormatter weatherDayFormatter = new WeatherDayFormatter(weatherDay);
+        viewHolder.text.setText(
+                String.format(
+                        getContext().getString(R.string.weather_data_template),
+                        weatherDayFormatter.getDay(),
+                        weatherDay.weatherDescription(),
+                        weatherDayFormatter.getMaxTemperature(isImperial),
+                        weatherDayFormatter.getMinTemperature(isImperial)
+                )
+        );
         return convertView;
     }
 

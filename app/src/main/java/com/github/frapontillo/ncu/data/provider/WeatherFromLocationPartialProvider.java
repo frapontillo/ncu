@@ -1,15 +1,16 @@
 package com.github.frapontillo.ncu.data.provider;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.github.frapontillo.ncu.data.UnsupportedUriOperationException;
 import com.github.frapontillo.ncu.data.WeatherDbHelper;
 import com.github.frapontillo.ncu.data.contract.LocationContract;
 import com.github.frapontillo.ncu.data.contract.WeatherContract;
 
-public class WeatherFromLocationPartialProvider extends PartialProvider<WeatherDbHelper> {
+public class WeatherFromLocationPartialProvider extends QueryOnlyPartialProvider<WeatherDbHelper> {
+
+    private static final String LIMIT_TO_DAYS_IN_WEEK = "7";
+
     private final WeatherContract weatherContract;
 
     public WeatherFromLocationPartialProvider(WeatherDbHelper helper) {
@@ -32,22 +33,9 @@ public class WeatherFromLocationPartialProvider extends PartialProvider<WeatherD
                 new String[]{location},
                 null,
                 null,
-                sortOrder
+                sortOrder,
+                LIMIT_TO_DAYS_IN_WEEK
         );
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        throw new UnsupportedUriOperationException("insert", uri);
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        throw new UnsupportedUriOperationException("delete", uri);
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new UnsupportedUriOperationException("update", uri);
-    }
 }

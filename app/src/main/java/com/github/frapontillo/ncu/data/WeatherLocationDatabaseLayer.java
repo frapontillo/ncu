@@ -6,14 +6,14 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.github.frapontillo.ncu.data.contract.LocationContract;
-import com.github.frapontillo.ncu.weather.WeatherLocation;
+import com.github.frapontillo.ncu.weather.model.WeatherLocation;
 
-public class WeatherLocationPersister {
+public class WeatherLocationDatabaseLayer {
 
     private final ContentResolver contentResolver;
     private final LocationContract locationContract;
 
-    public WeatherLocationPersister(ContentResolver contentResolver, LocationContract locationContract) {
+    public WeatherLocationDatabaseLayer(ContentResolver contentResolver, LocationContract locationContract) {
         this.contentResolver = contentResolver;
         this.locationContract = locationContract;
     }

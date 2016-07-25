@@ -1,14 +1,12 @@
 package com.github.frapontillo.ncu.data.provider;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.github.frapontillo.ncu.data.UnsupportedUriOperationException;
 import com.github.frapontillo.ncu.data.WeatherDbHelper;
 import com.github.frapontillo.ncu.data.contract.WeatherContract;
 
-public class WeatherFromLocationAndDatePartialProvider extends PartialProvider<WeatherDbHelper> {
+public class WeatherFromLocationAndDatePartialProvider extends QueryOnlyPartialProvider<WeatherDbHelper> {
     private final WeatherContract weatherContract;
 
     public WeatherFromLocationAndDatePartialProvider(WeatherDbHelper helper) {
@@ -29,7 +27,7 @@ public class WeatherFromLocationAndDatePartialProvider extends PartialProvider<W
         return WeatherContract.WEATHER_JOIN_LOCATION_QUERY_BUILDER.query(
                 getHelper().getReadableDatabase(),
                 projection,
-                WeatherContract.LOCATION_AND_DATE_SELECTION_QUERY_PART,
+                WeatherContract.SELECTION_LOCATION_SETTING_EQUALS_AND_WEATHER_DATE_GREATER_OR_EQUALS,
                 new String[]{location, String.valueOf(date)},
                 null,
                 null,
@@ -37,18 +35,4 @@ public class WeatherFromLocationAndDatePartialProvider extends PartialProvider<W
         );
     }
 
-    @Override
-    public Uri insert(Uri uri, ContentValues values) {
-        throw new UnsupportedUriOperationException("insert", uri);
-    }
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        throw new UnsupportedUriOperationException("delete", uri);
-    }
-
-    @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        throw new UnsupportedUriOperationException("update", uri);
-    }
 }
