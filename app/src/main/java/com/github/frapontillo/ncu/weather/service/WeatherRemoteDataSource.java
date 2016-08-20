@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.functions.Func1;
 
-class WeatherRemoteDataSource implements WeatherDataSource {
+class WeatherRemoteDataSource implements WeatherReadableDataSource {
 
     private static final int NO_WEATHER_ID = -1;
     private static final String OPEN_WEATHER_MAP_BASE_URL = "http://api.openweathermap.org/data/2.5/";
@@ -139,13 +139,8 @@ class WeatherRemoteDataSource implements WeatherDataSource {
     }
 
     @Override
-    public Func1<Weather, Weather> persistWeather() {
-        return new Func1<Weather, Weather>() {
-            @Override
-            public Weather call(Weather weather) {
-                // no-op
-                return weather;
-            }
-        };
+    public boolean retrievesFreshData() {
+        return true;
     }
+
 }

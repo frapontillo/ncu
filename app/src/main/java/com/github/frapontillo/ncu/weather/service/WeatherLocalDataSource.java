@@ -11,14 +11,15 @@ import com.github.frapontillo.ncu.data.contract.LocationContract;
 import com.github.frapontillo.ncu.data.contract.WeatherContract;
 import com.github.frapontillo.ncu.weather.model.Weather;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import rx.Observable;
-import rx.functions.Func1;
 
-class WeatherLocalDataSource implements WeatherDataSource {
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
+class WeatherLocalDataSource implements WeatherReadableDataSource, WeatherWritableDataSource {
 
     private final WeatherForecastDatabaseLayer weatherForecastDatabaseLayer;
     private final WeatherLocationDatabaseLayer weatherLocationDatabaseLayer;
@@ -43,26 +44,26 @@ class WeatherLocalDataSource implements WeatherDataSource {
 
     @Override
     public Observable<Weather> getWeather(String zipCode) {
-        List<Weather> latestWeatherList = Collections.emptyList();
+        List<Weather> latestWeatherList = emptyList();
 
         Date todayAtMidnight = clock.getTodayAtMidnight();
         Weather latestWeather = weatherForecastDatabaseLayer.getLatestWeatherFor(zipCode, todayAtMidnight);
         if (latestWeather != null) {
-            latestWeatherList = Collections.singletonList(latestWeather);
+            latestWeatherList = singletonList(latestWeather);
         }
 
         return Observable.from(latestWeatherList);
     }
 
     @Override
-    public Func1<Weather, Weather> persistWeather() {
-        return new Func1<Weather, Weather>() {
-            @Override
-            public Weather call(Weather weather) {
-                long locationId = weatherLocationDatabaseLayer.saveLocationAndGetId(weather.location());
-                return weatherForecastDatabaseLayer.persistWeatherForecast(weather, locationId);
-            }
-        };
+    public boolean retrievesFreshData() {
+        return false;
+    }
+
+    @Override
+    public Weather persistWeather(Weather weather) {
+        long locationId = weatherLocationDatabaseLayer.saveLocationAndGetId(weather.location());
+        return weatherForecastDatabaseLayer.persistWeatherForecast(weather, locationId);
     }
 
 }
