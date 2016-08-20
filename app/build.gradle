@@ -25,7 +25,7 @@ android {
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
 
         versionCode 1
         versionName "1.0"
@@ -68,8 +68,8 @@ dependencies {
 
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
-
     testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+
     testCompile "junit:junit:4.12"
 
     androidTestCompile "junit:junit:4.12"

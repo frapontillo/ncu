@@ -4,10 +4,11 @@ import com.github.frapontillo.ncu.weather.model.Event;
 import com.github.frapontillo.ncu.weather.model.Weather;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.schedulers.Schedulers;
+
+import static com.github.frapontillo.ncu.weather.service.Helper.asObservable;
 
 public class WeatherServiceAsync implements WeatherService {
 
@@ -24,11 +25,6 @@ public class WeatherServiceAsync implements WeatherService {
                 .compose(asAsync());
     }
 
-    @Override
-    public Action0 refreshWeather(String zipCode) {
-        return asAsyncAction(weatherService.refreshWeather(zipCode));
-    }
-
     private Observable.Transformer<? super Event<Weather>, ? extends Event<Weather>> asAsync() {
         return new Observable.Transformer<Event<Weather>, Event<Weather>>() {
             @Override
@@ -40,24 +36,19 @@ public class WeatherServiceAsync implements WeatherService {
         };
     }
 
-    private static Action0 asAsyncAction(final Action0 action0) {
+    @Override
+    public Action0 refreshWeather(String zipCode) {
+        return asAsyncAction(weatherService.refreshWeather(zipCode));
+    }
+
+    private Action0 asAsyncAction(final Action0 action) {
         return new Action0() {
             @Override
             public void call() {
-                asObservable(action0)
+                asObservable(action)
                         .subscribeOn(Schedulers.io())
                         .subscribe();
             }
         };
-    }
-
-    private static Observable<Void> asObservable(final Action0 action0) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override
-            public void call(Subscriber<? super Void> subscriber) {
-                action0.call();
-                subscriber.onCompleted();
-            }
-        });
     }
 }

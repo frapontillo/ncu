@@ -11,6 +11,7 @@ import com.github.frapontillo.ncu.weather.model.WeatherDay;
 import com.github.frapontillo.ncu.weather.model.WeatherLocation;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.github.frapontillo.ncu.data.provider.CursorHelper.*;
@@ -35,13 +36,13 @@ public class WeatherForecastDatabaseLayer {
         return weather;
     }
 
-    public Weather getLatestWeatherFor(String zipCode) {
+    public Weather getLatestWeatherFor(String zipCode, Date date) {
         Cursor cursor = contentResolver.query(
                 WeatherContract.CONTENT_URI.buildUpon().appendPath(zipCode).build(),
                 null,
-                null,
-                new String[]{WeatherContract.SELECTION_WEATHER_ID_EQUALS},
-                WeatherContract._ID
+                WeatherContract.SELECTION_WEATHER_DATE_AFTER,
+                new String[]{Long.toString(date.getTime())},
+                WeatherContract.COLUMNS.DATE
         );
 
         Weather weather = null;

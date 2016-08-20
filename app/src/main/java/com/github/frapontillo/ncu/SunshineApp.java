@@ -5,7 +5,7 @@ import android.preference.PreferenceManager;
 
 import com.github.frapontillo.ncu.weather.service.WeatherService;
 import com.github.frapontillo.ncu.weather.service.WeatherServiceAsync;
-import com.github.frapontillo.ncu.weather.service.WeatherServicePersisted;
+import com.github.frapontillo.ncu.weather.service.WeatherServiceLocalThenRemote;
 import com.squareup.leakcanary.LeakCanary;
 
 public class SunshineApp extends Application {
@@ -21,7 +21,7 @@ public class SunshineApp extends Application {
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
         weatherService = new WeatherServiceAsync(
-                WeatherServicePersisted.newInstance(getApplicationContext())
+                WeatherServiceLocalThenRemote.newInstance(getApplicationContext())
         );
     }
 

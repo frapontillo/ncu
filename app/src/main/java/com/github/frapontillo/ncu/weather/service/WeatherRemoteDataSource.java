@@ -26,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
 import rx.functions.Func1;
 
-public class WeatherRemoteDataSource {
+class WeatherRemoteDataSource implements WeatherDataSource {
 
     private static final int NO_WEATHER_ID = -1;
     private static final String OPEN_WEATHER_MAP_BASE_URL = "http://api.openweathermap.org/data/2.5/";
@@ -34,7 +34,7 @@ public class WeatherRemoteDataSource {
 
     private final ApiWeatherService apiWeatherService;
 
-    public static WeatherRemoteDataSource newInstance() {
+    static WeatherRemoteDataSource newInstance() {
         CallAdapter.Factory rxJavaCallAdapterFactory = RxJavaCallAdapterFactory.create();
         Gson gson = new GsonBuilder()
                 .registerTypeAdapterFactory(new AutoValueGsonTypeAdapterFactory())
@@ -56,11 +56,12 @@ public class WeatherRemoteDataSource {
         return new WeatherRemoteDataSource(apiWeatherService);
     }
 
-    public WeatherRemoteDataSource(ApiWeatherService apiWeatherService) {
+    private WeatherRemoteDataSource(ApiWeatherService apiWeatherService) {
         this.apiWeatherService = apiWeatherService;
     }
 
-    public Observable<Weather> getWeekWeather(String zipCode) {
+    @Override
+    public Observable<Weather> getWeather(String zipCode) {
         return apiWeatherService
                 .getDailyForecast(zipCode, "json", "metric", 7)
                 .map(toDomainModel(zipCode));
@@ -137,4 +138,14 @@ public class WeatherRemoteDataSource {
         return new Date(apiDay.date() * 1000);
     }
 
+    @Override
+    public Func1<Weather, Weather> persistWeather() {
+        return new Func1<Weather, Weather>() {
+            @Override
+            public Weather call(Weather weather) {
+                // no-op
+                return weather;
+            }
+        };
+    }
 }

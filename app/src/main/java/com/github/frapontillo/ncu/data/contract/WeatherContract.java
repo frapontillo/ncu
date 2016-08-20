@@ -20,6 +20,7 @@ public class WeatherContract implements BaseColumns {
     public static final Uri CONTENT_URI = Contract.BASE_CONTENT_URI.buildUpon().appendPath(TABLE_NAME).build();
 
     public static final String SELECTION_WEATHER_ID_EQUALS = WeatherContract.TABLE_NAME + "." + WeatherContract._ID + " = ?";
+    public static final String SELECTION_WEATHER_DATE_AFTER = WeatherContract.TABLE_NAME + "." + COLUMNS.DATE + " >= ?";
     public static final String SELECTION_LOCATION_SETTING_EQUALS =
             LocationContract.TABLE_NAME + "." + LocationContract.COLUMNS.SETTING + " = ?";
     public static final String SELECTION_LOCATION_SETTING_EQUALS_AND_WEATHER_DATE_GREATER_OR_EQUALS =

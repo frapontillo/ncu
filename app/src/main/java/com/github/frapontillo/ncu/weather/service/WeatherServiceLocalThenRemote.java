@@ -6,27 +6,27 @@ import com.github.frapontillo.ncu.weather.model.Event;
 import com.github.frapontillo.ncu.weather.model.Weather;
 import com.jakewharton.rxrelay.BehaviorRelay;
 
-import rx.Notification;
 import rx.Observable;
 import rx.functions.Action0;
-import rx.functions.Func1;
 
-public class WeatherServicePersisted implements WeatherService {
+import static com.github.frapontillo.ncu.weather.service.Helper.asEvent;
+
+public class WeatherServiceLocalThenRemote implements WeatherService {
 
     private final WeatherRemoteDataSource weatherRemoteDataSource;
     private final WeatherLocalDataSource weatherLocalDataSource;
 
     private final BehaviorRelay<Event<Weather>> weatherRelay;
 
-    public static WeatherServicePersisted newInstance(Context context) {
-        return new WeatherServicePersisted(
+    public static WeatherServiceLocalThenRemote newInstance(Context context) {
+        return new WeatherServiceLocalThenRemote(
                 WeatherRemoteDataSource.newInstance(),
                 WeatherLocalDataSource.newInstance(context)
         );
     }
 
-    public WeatherServicePersisted(WeatherRemoteDataSource weatherRemoteDataSource,
-                                   WeatherLocalDataSource weatherLocalDataSource) {
+    private WeatherServiceLocalThenRemote(WeatherRemoteDataSource weatherRemoteDataSource,
+                                          WeatherLocalDataSource weatherLocalDataSource) {
         this.weatherRemoteDataSource = weatherRemoteDataSource;
         this.weatherLocalDataSource = weatherLocalDataSource;
 
@@ -42,7 +42,7 @@ public class WeatherServicePersisted implements WeatherService {
 
     private Observable<Event<Weather>> initialiseFromLocalOrRemote(String zipCode) {
         return weatherLocalDataSource
-                .getLatestWeatherFor(zipCode)
+                .getWeather(zipCode)
                 .switchIfEmpty(getWeatherFromRemote(zipCode))
                 .compose(asEvent())
                 .doOnNext(weatherRelay);
@@ -63,36 +63,8 @@ public class WeatherServicePersisted implements WeatherService {
 
     private Observable<Weather> getWeatherFromRemote(String zipCode) {
         return weatherRemoteDataSource
-                .getWeekWeather(zipCode)
+                .getWeather(zipCode)
                 .map(weatherLocalDataSource.persistWeather());
-    }
-
-    private Observable.Transformer<Weather, Event<Weather>> asEvent() {
-        return new Observable.Transformer<Weather, Event<Weather>>() {
-            @Override
-            public Observable<Event<Weather>> call(Observable<Weather> weatherObservable) {
-                return weatherObservable
-                        .materialize()
-                        .map(notificationToEvent())
-                        .startWith(Event.<Weather>idle());
-            }
-        };
-    }
-
-    private Func1<Notification<Weather>, Event<Weather>> notificationToEvent() {
-        return new Func1<Notification<Weather>, Event<Weather>>() {
-            @Override
-            public Event<Weather> call(Notification<Weather> weatherNotification) {
-                if (weatherNotification.isOnNext()) {
-                    return Event.loading(weatherNotification.getValue());
-                } else if (weatherNotification.isOnError()) {
-                    return Event.error(weatherNotification.getThrowable());
-                } else if (weatherNotification.isOnCompleted()) {
-                    return Event.idle();
-                }
-                throw new IllegalStateException("Notification is not onCompleted nor onError nor onNext.");
-            }
-        };
     }
 
 }
